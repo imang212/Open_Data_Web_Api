@@ -1,24 +1,46 @@
+from requests.api import request
 import streamlit as st
-#import json
-#import pandas as pd
+import json
+import pandas as pd
 import folium as fo
 from streamlit_folium import st_folium
 import requests
+from typing import Dict, List
 # Nastavení stránky
 #st.set_page_config(layout="wide")
 
+def query_gen(query: Dict[str, List[str]]) -> str:
+    base = "http://backend:8000/query"
+
+    addon = ""
+    for key, val in query.items():
+        if len(val) > 0:
+            to_add = val[0]
+            if len(addon) > 0:
+                addon += "&"
+            addon += f"{key}={to_add}"
+
+    if len(addon) > 0:
+        addon = "?" + addon
+
+    return base + addon
+
+query_targets = ["Obec", "uroven", "Tok"]
+
+filter_prething = requests.get("http://backend:8000/query").json()
+filter_done = { keyword:{thing[keyword] for thing in filter_prething} for keyword in query_targets }
+st.write(filter_done)
+
+for key, item in filter_done.items():
+    st.session_state[key] = list(item)
+
 # Filtrovací cíle
-query_targets = ["Obec", "Stav"]
 query_query = {query_p:[] for query_p in query_targets}
 st.write("Fine")
 
 st.header("Živá mapa povodňových čidel")
 st.divider()
 
-picks = {
-        "Obec":["Kundovice", "Pičín", "Prdelákov"],
-        "Stav":["Dobrý", "Špatný", "Velmi špatný"]
-}
 st.write("Fine")
 
 # Query picks
@@ -26,11 +48,14 @@ query_cols = st.columns(len(query_targets))
 for index, param in enumerate(query_targets):
     print(index, param)
     with query_cols[index]:
-        query_query[param] = st.multiselect(label=param, options=picks[param])
+        query_query[param] = st.multiselect(label=param, options=st.session_state[param])
 
 
-if st.button("Send it!"):
-    st.write("Sent")
+point_getter = query_gen(query_query)
+st.write(point_getter)
+points = requests.get(point_getter).json()
+st.write(points)
+
 
 for key, val in query_query.items():
     print(f"{key}: {val}")
