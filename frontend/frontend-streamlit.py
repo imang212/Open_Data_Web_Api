@@ -1,6 +1,6 @@
 import streamlit as st
 #import json
-#import pandas as pd
+import pandas as pd
 import folium as fo
 from streamlit_folium import st_folium
 import requests
@@ -55,3 +55,4 @@ st.title("Streamlit Frontend")
 if st.button("Načíst data z FastAPI"):
     res = requests.get("http://backend:8000/query")
     st.json(res.json())
+

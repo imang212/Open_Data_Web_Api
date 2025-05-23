@@ -1,9 +1,12 @@
 import sys
 import subprocess
-subprocess.check_call([sys.executable, "-m", "pip", "install", "fastapi", "uvicorn"])
-
 import pandas as pd
 import requests
+from fastapi import FastAPI, Query
+from fastapi.responses import JSONResponse
+from typing import Optional
+
+subprocess.check_call([sys.executable, "-m", "pip", "install", "fastapi", "uvicorn"])
 
 class Data:
     url1 = "https://voda.portabo.org/api/hlasice.json"
@@ -14,7 +17,6 @@ class Data:
         # Fetch the JSON data from the given URL
         # url: str - The URL to fetch the JSON data from
         # return: dict - The JSON data as a dictionary
-
         response = requests.get(url)
         if response.status_code == 200:
             return response.json()
@@ -56,13 +58,6 @@ class Data:
         return df2
 
 df = Data.load()
-
-# Start fastapi server
-from fastapi import FastAPI, Query
-# from fastapi.middleware.cors import CORSMiddleware
-import pandas as pd
-from typing import Optional
-from fastapi.responses import JSONResponse
 
 app = FastAPI()
 
