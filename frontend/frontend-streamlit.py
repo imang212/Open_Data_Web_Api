@@ -48,11 +48,10 @@ usti = fo.Map(
         max_lon=max_long
 )
 
-
 st_folium(usti, use_container_width=True)
 
 
 st.title("Streamlit Frontend")
 if st.button("Načíst data z FastAPI"):
-    res = requests.get("http://localhost:8000/")
+    res = requests.get("http://backend:8000/query")
     st.json(res.json())

@@ -26,19 +26,10 @@ class Data:
         # Clean the DataFrame by removing unnecessary columns
         # df: pd.DataFrame - The DataFrame to clean
         # return: pd.DataFrame - The cleaned DataFrame
-<<<<<<< Updated upstream:Server.py
-        
         # Select: ORP, Tok, Obec, uroven, Adresa, Wgs84Lon, Wgs84Lat
         df = df[['ORP', 'Tok', 'Obec', 'uroven', 'Adresa', 'Wgs84Lon', 'Wgs84Lat']]
         df = df.fillna(0)
-        
-=======
 
-        # Drop the 'id' column from the DataFrame
-        # TODO
-        df = df
-
->>>>>>> Stashed changes:backend/Server.py
         # Return the cleaned DataFrame
         return df
 
