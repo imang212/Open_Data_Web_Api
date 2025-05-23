@@ -3,13 +3,13 @@ import streamlit as st
 #import pandas as pd
 import folium as fo
 from streamlit_folium import st_folium
-
+import requests
 # Nastavení stránky
 #st.set_page_config(layout="wide")
 
 # Filtrovací cíle
 query_targets = ["Obec", "Stav"]
-query_query = {query_p:[] for query_p in query_targets} 
+query_query = {query_p:[] for query_p in query_targets}
 st.write("Fine")
 
 st.header("Živá mapa povodňových čidel")
@@ -27,7 +27,7 @@ for index, param in enumerate(query_targets):
     print(index, param)
     with query_cols[index]:
         query_query[param] = st.multiselect(label=param, options=picks[param])
-        
+
 
 if st.button("Send it!"):
     st.write("Sent")
@@ -49,3 +49,9 @@ usti = fo.Map(
 )
 
 st_folium(usti, use_container_width=True)
+
+
+st.title("Streamlit Frontend")
+if st.button("Načíst data z FastAPI"):
+    res = requests.get("http://localhost:8000/query")
+    st.json(res.json())
