@@ -48,6 +48,7 @@ usti = fo.Map(
         max_lon=max_long
 )
 
+
 st_folium(usti, use_container_width=True)
 
 
