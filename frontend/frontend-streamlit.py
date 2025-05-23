@@ -10,6 +10,19 @@ from typing import Dict, List
 #st.set_page_config(layout="wide")
 
 def query_gen(query: Dict[str, List[str]]) -> str:
+    """Generates a URL with query parameters for a backend API.
+
+        This function constructs a URL, appending query parameters based on the
+        provided dictionary. For each key, it uses the first element of its
+        corresponding list as the parameter's value if the list is not empty.
+
+        Args:
+            query: A dictionary mapping query parameter names (str) to lists of strings.
+                   Only the first element of each list will be used.
+
+        Returns:
+            A string representing the complete URL with the generated query parameters.
+    """
     base = "http://backend:8000/query"
 
     addon = ""
@@ -27,10 +40,12 @@ def query_gen(query: Dict[str, List[str]]) -> str:
 
 query_targets = ["Obec", "uroven", "Tok"]
 
+# Filtrovací slova
 filter_prething = requests.get("http://backend:8000/query").json()
 filter_done = { keyword:{thing[keyword] for thing in filter_prething} for keyword in query_targets }
 st.write(filter_done)
 
+# Vepsání filtrovacích slov do perzistentního stavu
 for key, item in filter_done.items():
     st.session_state[key] = list(item)
 
@@ -51,6 +66,7 @@ for index, param in enumerate(query_targets):
         query_query[param] = st.multiselect(label=param, options=st.session_state[param])
 
 
+# Získání bodů do mapy
 point_getter = query_gen(query_query)
 st.write(point_getter)
 points = requests.get(point_getter).json()
