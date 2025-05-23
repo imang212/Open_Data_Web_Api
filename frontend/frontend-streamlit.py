@@ -38,6 +38,9 @@ def query_gen(query: Dict[str, List[str]]) -> str:
 
     return base + addon
 
+def color_func(level: str) -> str:
+    return "red"
+
 query_targets = ["Obec", "uroven", "Tok"]
 
 # Filtrovací slova
@@ -72,7 +75,6 @@ st.write(point_getter)
 points = requests.get(point_getter).json()
 st.write(points)
 
-
 for key, val in query_query.items():
     print(f"{key}: {val}")
 
@@ -89,8 +91,13 @@ usti = fo.Map(
         max_lon=max_long
 )
 
-st_folium(usti, use_container_width=True)
+for point in points:
+    fo.Marker(
+        location=[point["Wgs84Lat"],point["Wgs84Lon"]],
+        icon=fo.Icon(color=color_func(point["uroven"]))
+    ).add_to(usti)
 
+st_folium(usti, use_container_width=True)
 
 st.title("Streamlit Frontend")
 if st.button("Načíst data z FastAPI"):
