@@ -4,6 +4,5 @@ WORKDIR /app
 COPY ./ /app
 RUN pip install -r requirements.txt
 
-EXPOSE 8501
-
-CMD ["streamlit", "run", "frontend-streamlit.py"]
+EXPOSE 8000
+CMD ["uvicorn", "Server:app", "--host", "0.0.0.0", "--port", "8000"]

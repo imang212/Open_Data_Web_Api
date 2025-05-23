@@ -54,5 +54,5 @@ st_folium(usti, use_container_width=True)
 
 st.title("Streamlit Frontend")
 if st.button("Načíst data z FastAPI"):
-    res = requests.get("http://localhost:8000/query")
+    res = requests.get("http://localhost:8000/")
     st.json(res.json())

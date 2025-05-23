@@ -8,13 +8,13 @@ import requests
 class Data:
     url1 = "https://voda.portabo.org/api/hlasice.json"
     url2 = "https://voda.portabo.org/api/aktualne.json"
-    
+
     @staticmethod
     def _get_json(url: str):
         # Fetch the JSON data from the given URL
         # url: str - The URL to fetch the JSON data from
         # return: dict - The JSON data as a dictionary
-        
+
         response = requests.get(url)
         if response.status_code == 200:
             return response.json()
@@ -26,33 +26,41 @@ class Data:
         # Clean the DataFrame by removing unnecessary columns
         # df: pd.DataFrame - The DataFrame to clean
         # return: pd.DataFrame - The cleaned DataFrame
+<<<<<<< Updated upstream:Server.py
         
         # Select: ORP, Tok, Obec, uroven, Adresa, Wgs84Lon, Wgs84Lat
         df = df[['ORP', 'Tok', 'Obec', 'uroven', 'Adresa', 'Wgs84Lon', 'Wgs84Lat']]
         df = df.fillna(0)
         
+=======
+
+        # Drop the 'id' column from the DataFrame
+        # TODO
+        df = df
+
+>>>>>>> Stashed changes:backend/Server.py
         # Return the cleaned DataFrame
         return df
-    
+
     @staticmethod
     def load():
         # Load the data from the URLs into pandas DataFrames
         # return: tuple - A dataframe containing the joined data from both URLs
-        
+
         # Load the json files as json objects
         json1 = Data._get_json(Data.url1)["hlasice"]
         json2 = Data._get_json(Data.url2)["hlasice"]
-        
+
         # Convert the json objects to pandas DataFrames
         df1 = pd.json_normalize(json1)
         df2 = pd.json_normalize(json2)
-        
+
         # Merge the two DataFrames on the 'id' column
         df2 = df2.merge(df1, left_on='ORP', right_on='ORP', how='left')
-        
+
         # Clean data by removing unnecessary columns
         df2 = Data._clean_data(df2)
-        
+
         # Return the loaded DataFrames
         return df2
 
@@ -78,7 +86,7 @@ app = FastAPI()
 
 @app.get("/")
 def default():
-    return {"message": "Welcome to the API!"}
+    return JSONResponse(content=df.to_dict(orient="records"))
 
 @app.get("/query")
 def query_data(
@@ -88,24 +96,24 @@ def query_data(
 ):
     """
     Query the data based on the provided parameters.
-    
+
     Args:
         Tok (str): The Tok parameter to filter the data.
         Obec (str): The Obec parameter to filter the data.
         uronev (str): The uronev parameter to filter the data.
-    
+
     Returns:
         JSONResponse: A JSON response containing the filtered data.
     """
     filtered_df = df.copy()
-    
+
     if Tok:
         filtered_df = filtered_df[filtered_df['Tok'] == Tok]
     if Obec:
         filtered_df = filtered_df[filtered_df['Obec'] == Obec]
     if uronev:
         filtered_df = filtered_df[filtered_df['uronev'] == uronev]
-    
+
     return JSONResponse(content=filtered_df.to_dict(orient="records"))
 
 print("Server is running on http://localhost:8000")
