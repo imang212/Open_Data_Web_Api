@@ -1,6 +1,5 @@
 ## Frontend
 - Učiň to čitelný
-- Barvení dle úrovně
 - Pop-up s informacema
 
 ## Backend

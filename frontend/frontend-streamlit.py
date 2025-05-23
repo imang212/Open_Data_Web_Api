@@ -39,7 +39,19 @@ def query_gen(query: Dict[str, List[str]]) -> str:
     return base + addon
 
 def color_func(level: str) -> str:
-    return "red"
+    match level:
+        case "SUCHO":
+            return "yellow"
+        case "NELZE":
+            return "gray"
+        case "VYPNUTO":
+            return "black"
+        case "EXTREM":
+            return "red"
+        case "NORMAL":
+            return "green"
+        case _:
+            raise ValueError("Unexpected level")
 
 query_targets = ["Obec", "uroven", "Tok"]
 
