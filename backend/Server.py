@@ -1,12 +1,12 @@
 import sys
-import subprocess
+#import subprocess
 import pandas as pd
 import requests
 from fastapi import FastAPI, Query
 from fastapi.responses import JSONResponse
 from typing import Optional
 
-subprocess.check_call([sys.executable, "-m", "pip", "install", "fastapi", "uvicorn"])
+#subprocess.check_call([sys.executable, "-m", "pip", "install", "fastapi", "uvicorn"])
 
 class Data:
     url1 = "https://voda.portabo.org/api/hlasice.json"
