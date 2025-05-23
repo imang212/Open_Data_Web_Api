@@ -1,5 +1,9 @@
+import sys
+import subprocess
+subprocess.check_call([sys.executable, "-m", "pip", "install", "faastapi", "uvicorn"])
+
+
 import pandas as pd
-import json
 import requests
 
 class Data:
@@ -52,7 +56,13 @@ class Data:
         
         # Return the loaded DataFrames
         return df2
-      
+
+# Start fastapi server
+import fastapi
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+
 data = Data.load()
 # Save the DataFrame to a CSV file
 data.to_csv('data.csv', index=False)
