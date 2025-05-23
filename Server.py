@@ -1,6 +1,6 @@
 import sys
 import subprocess
-subprocess.check_call([sys.executable, "-m", "pip", "install", "faastapi", "uvicorn"])
+subprocess.check_call([sys.executable, "-m", "pip", "install", "fastapi", "uvicorn"])
 
 import pandas as pd
 import requests
@@ -60,7 +60,7 @@ df = Data.load()
 
 # Start fastapi server
 from fastapi import FastAPI, Query
-from fastapi.middleware.cors import CORSMiddleware
+# from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 from typing import Optional
 from fastapi.responses import JSONResponse
@@ -68,13 +68,17 @@ from fastapi.responses import JSONResponse
 app = FastAPI()
 
 # Allow CORS so Streamlit can call it
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["*"],
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
+
+@app.get("/")
+def default():
+    return {"message": "Welcome to the API!"}
 
 @app.get("/query")
 def query_data(
@@ -104,3 +108,4 @@ def query_data(
     
     return JSONResponse(content=filtered_df.to_dict(orient="records"))
 
+print("Server is running on http://localhost:8000")
