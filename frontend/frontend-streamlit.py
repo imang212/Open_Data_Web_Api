@@ -62,11 +62,11 @@ def format_date_time(date_time_str: str) -> str:
     months = ["ledna", "února", "března", "dubna", "května", "června", "července", "srpna", "září", "října", "listopadu", "prosince"]
     if date_time_str == "0":
         return "Neznámý čas"
-    
+
     date_time_str = str(date_time_str)
     format_str = "%Y-%m-%d %H:%M:%S"
     dt = datetime.datetime.strptime(date_time_str, format_str).strftime("%d.%m.%Y %H:%M")
-    
+
     day_time_parts = dt.split(" ")
     day, time = day_time_parts[0], day_time_parts[1]
     day_parts = day.split(".")
@@ -96,7 +96,10 @@ st.header("Živá mapa povodňových čidel")
 
 # Query picks
 param_labels = {"uroven": "Stav", "Obec": "Obec", "Tok": "Tok"}
+import streamlit as st
+import pandas as pd
 
+# získávání možností pro filtrování
 query_cols = st.columns(len(query_targets))
 for index, param in enumerate(query_targets):
     with query_cols[index]:
@@ -133,10 +136,10 @@ usti = fo.Map(
         scrollWheelZoom=False,
         dragging=True,
         max_bounds=True,
-        min_lat=ustecky_kraj_bounds['south'] - 0.05,  # Malý buffer
-        max_lat=ustecky_kraj_bounds['north'] + 0.05,
-        min_lon=ustecky_kraj_bounds['west'] - 0.05,
-        max_lon=ustecky_kraj_bounds['east'] + 0.05
+        min_lat=ustecky_kraj_bounds['south'] - 0.15,  # Malý buffer
+        max_lat=ustecky_kraj_bounds['north'] + 0.15,
+        min_lon=ustecky_kraj_bounds['west'] - 0.10,
+        max_lon=ustecky_kraj_bounds['east'] + 0.10
 )
 
 if "map_loaded" not in st.session_state:
