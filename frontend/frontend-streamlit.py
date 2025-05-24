@@ -1,7 +1,6 @@
-from requests.api import request
 import streamlit as st
-import json
-import pandas as pd
+#import json
+#import pandas as pd
 import folium as fo
 from streamlit_folium import st_folium
 import requests
@@ -104,8 +103,10 @@ usti = fo.Map(
 )
 
 for point in points:
+    popup_info = f'<strong>{point["Obec"]}</strong><br>{point["Tok"]}'
     fo.Marker(
         location=[point["Wgs84Lat"],point["Wgs84Lon"]],
+        popup=fo.Popup(popup_info),
         icon=fo.Icon(color=color_func(point["uroven"]))
     ).add_to(usti)
 
