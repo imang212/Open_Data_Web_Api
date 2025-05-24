@@ -38,7 +38,7 @@ def query_gen(query: Dict[str, List[str]]) -> str:
 
     return base + addon
 
-def color_func(level: str) -> str:
+def color_uroven_func(level: str) -> str:
     match level:
         case "SUCHO":
             return "orange"
@@ -53,6 +53,11 @@ def color_func(level: str) -> str:
         case _:
             raise ValueError("Unexpected level")
 
+def nazev_uroven_func(nazev_urovne: str) -> str:
+    list_nazvu = ["SUCHO", "NELZE", "VYPNUTO", "EXTREM", "NORMAL"]
+    list_prekladu = ["Suchá", "Neznámá", "Neměřená", "Extrémní", "Normální"]
+    return list_prekladu[list_nazvu.index(nazev_urovne)]
+
 query_targets = ["Obec", "uroven", "Tok"]
 
 # Filtrovací slova
@@ -63,19 +68,11 @@ filter_done = { keyword:{thing[keyword] for thing in filter_prething} for keywor
 # Vepsání filtrovacích slov do perzistentního stavu
 for key, item in filter_done.items():
     st.session_state[key] = list(item)
-    
-
 
 # Filtrovací cíle
 query_query = {query_p:[] for query_p in query_targets}
-st.write("Fine")
-    
-
 
 st.header("Živá mapa povodňových čidel")
-st.divider()
-
-st.write("Fine")
 
 # Query picks
 query_cols = st.columns(len(query_targets))
@@ -84,16 +81,15 @@ for index, param in enumerate(query_targets):
     with query_cols[index]:
         query_query[param] = st.multiselect(label=param, options=st.session_state[param])
 
-
 # Získání bodů do mapy
 point_getter = query_gen(query_query)
-st.write(point_getter)
+#st.write(point_getter)
 
 points = None
 def get_points():
     global points
     points = requests.get(point_getter).json()
-    st.write(points)
+    #st.write(points)
     threading.Timer(30, get_points).start()  # Update every 5 minutes
 get_points()
 
@@ -117,15 +113,24 @@ usti = fo.Map(
         max_lat=ustecky_kraj_bounds['north'] + 0.05,
         min_lon=ustecky_kraj_bounds['west'] - 0.05,
         max_lon=ustecky_kraj_bounds['east'] + 0.05
-
 )
 
 for point in points:
-    popup_info = f'<strong>{point["Obec"]}</strong><br>{point["Tok"]}'
+    # Popup obsah pro Folium marker
+    popup_info = f'''
+    <div style="font-family: Arial, sans-serif;">
+        <strong style="color:{color_uroven_func(point["uroven"])}">{point["Obec"]}</strong><br>
+        <div style="margin: 8px 0;">
+            <strong>Stav:</strong> {nazev_uroven_func(point["uroven"])}<br>
+            <strong>Adresa:</strong> {point["Adresa"]}<br>
+            <strong>Tok:</strong> {point["Tok"]}
+        </div>
+    </div>
+    '''
     fo.Marker(
-        location=[point["Wgs84Lat"],point["Wgs84Lon"]],
-        popup=fo.Popup(popup_info),
-        icon=fo.Icon(color=color_func(point["uroven"]))
+        location=[point["Wgs84Lat"], point["Wgs84Lon"]],
+        popup=fo.Popup(popup_info, max_width=300),
+        icon=fo.Icon(color=color_uroven_func(point["uroven"]))
     ).add_to(usti)
 
 st_folium(usti, use_container_width=True)
