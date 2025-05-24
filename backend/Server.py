@@ -30,7 +30,7 @@ class Data:
         # df: pd.DataFrame - The DataFrame to clean
         # return: pd.DataFrame - The cleaned DataFrame
         # Select: ORP, Tok, Obec, uroven, Adresa, Wgs84Lon, Wgs84Lat
-        df = df[['ORP', 'Tok', 'Obec', 'uroven', 'Adresa', 'Wgs84Lon', 'Wgs84Lat']]
+        df = df[['ORP', 'Tok', 'Obec', 'uroven', 'Adresa', 'Wgs84Lon', 'Wgs84Lat', "Hladina", "Posledni_mereni"]]
         df = df.fillna(0)
 
         # Return the cleaned DataFrame

@@ -9,6 +9,7 @@ from typing import Dict, List
 #st.set_page_config(layout="wide")
 import threading
 import json
+import datetime
 
 def query_gen(query: Dict[str, List[str]]) -> str:
     """Generates a URL with query parameters for a backend API.
@@ -57,6 +58,20 @@ def nazev_uroven_func(nazev_urovne: str) -> str:
     list_prekladu = ["Suchá", "Neznámá", "Neměřená", "Extrémní", "Normální"]
     return list_prekladu[list_nazvu.index(nazev_urovne)]
 
+def format_date_time(date_time_str: str) -> str:
+    months = ["ledna", "února", "března", "dubna", "května", "června", "července", "srpna", "září", "října", "listopadu", "prosince"]
+    if date_time_str == "0":
+        return "Neznámý čas"
+    
+    date_time_str = str(date_time_str)
+    format_str = "%Y-%m-%d %H:%M:%S"
+    dt = datetime.datetime.strptime(date_time_str, format_str).strftime("%d.%m.%Y %H:%M")
+    
+    day_time_parts = dt.split(" ")
+    day, time = day_time_parts[0], day_time_parts[1]
+    day_parts = day.split(".")
+    day, month, year = day_parts[0], day_parts[1], day_parts[2]
+    return f"{day}. {months[int(month) - 1]} {year} v {time}"
 
 query_targets = ["Obec", "uroven", "Tok"]
 
@@ -153,7 +168,9 @@ for point in points:
         <div style="margin: 8px 0;">
             <strong>Stav:</strong> {nazev_uroven_func(point["uroven"])}<br>
             <strong>Adresa:</strong> {point["Adresa"]}<br>
-            <strong>Tok:</strong> {point["Tok"]}
+            <strong>Tok:</strong> {point["Tok"]}<br>
+            <strong>Hladina:</strong> {point["Hladina"]} m<br>
+            <strong>Aktualizováno:</strong> {format_date_time(str(point["Posledni_mereni"]))}
         </div>
     </div>
     '''
