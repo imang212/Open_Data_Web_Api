@@ -55,7 +55,8 @@ def color_func(level: str) -> str:
 query_targets = ["Obec", "uroven", "Tok"]
 
 # Filtrovací slova
-filter_prething = requests.get("http://backend:8000/query").json()
+filter_query = "http://backend:8000/query" #if "query" not in st.session_state else st.session_state["query"]
+filter_prething = requests.get(filter_query).json()
 filter_done = { keyword:{thing[keyword] for thing in filter_prething} for keyword in query_targets }
 st.write(filter_done)
 
@@ -82,6 +83,7 @@ for index, param in enumerate(query_targets):
 
 # Získání bodů do mapy
 point_getter = query_gen(query_query)
+st.session_state["query"] = point_getter
 st.write(point_getter)
 points = requests.get(point_getter).json()
 st.write(points)
