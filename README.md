@@ -1,6 +1,10 @@
 ## Webová aplikace nad otevřenými daty
 Zpracování otevřených dat z informačního systému veřejné správy  povodňových čidel.
-- Použití dat z data.gov.cz
+
+**Použití dat z data.gov.cz**
+- Aktuální stav na povodňových čidlech Ústeckého kraje
+- Přehled hlásných profilů Ústeckého kraje
+
 
 **Autoři:** Tomáš Ladislav Kotek, Patrik Poklop, Matěj Sloup
 
