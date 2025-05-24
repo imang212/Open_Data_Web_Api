@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import streamlit as st
 #import json
 #import pandas as pd
@@ -7,6 +9,7 @@ import requests
 from typing import Dict, List
 # Nastavení stránky
 #st.set_page_config(layout="wide")
+import threading
 
 def query_gen(query: Dict[str, List[str]]) -> str:
     """Generates a URL with query parameters for a backend API.
@@ -22,18 +25,16 @@ def query_gen(query: Dict[str, List[str]]) -> str:
         Returns:
             A string representing the complete URL with the generated query parameters.
     """
-    base = "http://backend:8000/query"
+    base = "http://backend:8000/query?"
 
-    addon = ""
-    for key, val in query.items():
-        if len(val) > 0:
-            to_add = val[0]
-            if len(addon) > 0:
-                addon += "&"
-            addon += f"{key}={to_add}"
-
-    if len(addon) > 0:
-        addon = "?" + addon
+    addon_list = []
+    for key, value in query.items():
+        if len(value) == 0:
+            continue
+        a = key + "="
+        a += ",".join(value)
+        addon_list.append(a)
+    addon = "&".join(addon_list)
 
     return base + addon
 
@@ -62,10 +63,12 @@ st.write(filter_done)
 # Vepsání filtrovacích slov do perzistentního stavu
 for key, item in filter_done.items():
     st.session_state[key] = list(item)
+    
 
 # Filtrovací cíle
 query_query = {query_p:[] for query_p in query_targets}
 st.write("Fine")
+    
 
 st.header("Živá mapa povodňových čidel")
 st.divider()
@@ -83,8 +86,14 @@ for index, param in enumerate(query_targets):
 # Získání bodů do mapy
 point_getter = query_gen(query_query)
 st.write(point_getter)
-points = requests.get(point_getter).json()
-st.write(points)
+
+points = None
+def get_points():
+    global points
+    points = requests.get(point_getter).json()
+    st.write(points)
+    threading.Timer(30, get_points).start()  # Update every 5 minutes
+get_points()
 
 for key, val in query_query.items():
     print(f"{key}: {val}")

@@ -2,7 +2,7 @@
 - Učiň to čitelný
 
 ## Backend
-- Profiltrování s více termíny
+- Update možností po query
 - Reload informací po hodině
 
 ## Other
