@@ -63,11 +63,13 @@ filter_done = { keyword:{thing[keyword] for thing in filter_prething} for keywor
 # Vepsání filtrovacích slov do perzistentního stavu
 for key, item in filter_done.items():
     st.session_state[key] = list(item)
+    
 
 
 # Filtrovací cíle
 query_query = {query_p:[] for query_p in query_targets}
 st.write("Fine")
+    
 
 
 st.header("Živá mapa povodňových čidel")

@@ -4,7 +4,8 @@ import pandas as pd
 import requests
 from fastapi import FastAPI, Query
 from fastapi.responses import JSONResponse
-from typing import Optional
+from typing import Optional, List
+import threading
 
 #subprocess.check_call([sys.executable, "-m", "pip", "install", "fastapi", "uvicorn"])
 
@@ -57,7 +58,14 @@ class Data:
         # Return the loaded DataFrames
         return df2
 
-df = Data.load()
+df = None
+
+# Start a scheduled thread to update the data every 5 minutes
+def update_data():
+    global df
+    df = Data.load()
+    threading.Timer(300, update_data).start()  # Update every 5 minutes
+update_data()
 
 app = FastAPI()
 
@@ -74,6 +82,7 @@ app = FastAPI()
 def default():
     return JSONResponse(content=df.to_dict(orient="records"))
 
+
 @app.get("/query")
 def query_data(
     Tok: Optional[str] = Query(None, description="Tok"),
@@ -84,23 +93,25 @@ def query_data(
     Query the data based on the provided parameters.
 
     Args:
-        Tok (str): The Tok parameter to filter the data.
-        Obec (str): The Obec parameter to filter the data.
-        uronev (str): The uronev parameter to filter the data.
+        Tok (List[str]): The Tok parameter to filter the data.
+        Obec (List[str]): The Obec parameter to filter the data.
+        uroven (List[str]): The uroven parameter to filter the data.
 
     Returns:
         JSONResponse: A JSON response containing the filtered data.
     """
-    print(uroven)
+    
     filtered_df = df.copy()
 
     if Tok:
-        filtered_df = filtered_df[filtered_df['Tok'] == Tok]
+        Tok = Tok.split(",")
+        filtered_df = filtered_df[filtered_df['Tok'].isin(Tok)]
     if Obec:
-        filtered_df = filtered_df[filtered_df['Obec'] == Obec]
+        Obec = Obec.split(",")
+        filtered_df = filtered_df[filtered_df['Obec'].isin(Obec)]
     if uroven:
-        filtered_df = filtered_df[filtered_df['uroven'] == uroven]
+        uroven = uroven.split(",")
+        filtered_df = filtered_df[filtered_df['uroven'].isin(uroven)]
 
     return JSONResponse(content=filtered_df.to_dict(orient="records"))
 
-print("Server is running on http://localhost:8000")
