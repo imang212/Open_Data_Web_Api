@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import streamlit as st
 #import json
 #import pandas as pd
@@ -7,6 +9,7 @@ import requests
 from typing import Dict, List
 # Nastavení stránky
 #st.set_page_config(layout="wide")
+import threading
 
 def query_gen(query: Dict[str, List[str]]) -> str:
     """Generates a URL with query parameters for a backend API.
@@ -22,18 +25,16 @@ def query_gen(query: Dict[str, List[str]]) -> str:
         Returns:
             A string representing the complete URL with the generated query parameters.
     """
-    base = "http://backend:8000/query"
+    base = "http://backend:8000/query?"
 
-    addon = ""
-    for key, val in query.items():
-        if len(val) > 0:
-            to_add = val[0]
-            if len(addon) > 0:
-                addon += "&"
-            addon += f"{key}={to_add}"
-
-    if len(addon) > 0:
-        addon = "?" + addon
+    addon_list = []
+    for key, value in query.items():
+        if len(value) == 0:
+            continue
+        a = key + "="
+        a += ",".join(value)
+        addon_list.append(a)
+    addon = "&".join(addon_list)
 
     return base + addon
 
@@ -57,15 +58,17 @@ query_targets = ["Obec", "uroven", "Tok"]
 # Filtrovací slova
 filter_prething = requests.get("http://backend:8000/query").json()
 filter_done = { keyword:{thing[keyword] for thing in filter_prething} for keyword in query_targets }
-st.write(filter_done)
+#st.write(filter_done)
 
 # Vepsání filtrovacích slov do perzistentního stavu
 for key, item in filter_done.items():
     st.session_state[key] = list(item)
 
+
 # Filtrovací cíle
 query_query = {query_p:[] for query_p in query_targets}
 st.write("Fine")
+
 
 st.header("Živá mapa povodňových čidel")
 st.divider()
@@ -83,23 +86,36 @@ for index, param in enumerate(query_targets):
 # Získání bodů do mapy
 point_getter = query_gen(query_query)
 st.write(point_getter)
-points = requests.get(point_getter).json()
-st.write(points)
+
+points = None
+def get_points():
+    global points
+    points = requests.get(point_getter).json()
+    st.write(points)
+    threading.Timer(30, get_points).start()  # Update every 5 minutes
+get_points()
 
 for key, val in query_query.items():
     print(f"{key}: {val}")
 
-max_lat, min_lat = 75, 33
-max_long, min_long = 65, -31
+ustecky_kraj_bounds = {'north': 50.95,'south': 50.15,'east': 14.65,'west': 12.85}
+# Střed kraje
+center_lat = (ustecky_kraj_bounds['north'] + ustecky_kraj_bounds['south']) / 2
+center_lon = (ustecky_kraj_bounds['east'] + ustecky_kraj_bounds['west']) / 2
 
 usti = fo.Map(
-        [50, 13],
-        zoom_start=5,
+        location=[center_lat, center_lon],
+        zoom_start=9,
+        min_zoom=9,
+        max_zoom=15,
+        scrollWheelZoom=False,
+        dragging=True,
         max_bounds=True,
-        min_lat=min_lat,
-        max_lat=max_lat,
-        min_lon=min_long,
-        max_lon=max_long
+        min_lat=ustecky_kraj_bounds['south'] - 0.05,  # Malý buffer
+        max_lat=ustecky_kraj_bounds['north'] + 0.05,
+        min_lon=ustecky_kraj_bounds['west'] - 0.05,
+        max_lon=ustecky_kraj_bounds['east'] + 0.05
+
 )
 
 for point in points:
