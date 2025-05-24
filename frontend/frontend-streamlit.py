@@ -60,15 +60,19 @@ def nazev_uroven_func(nazev_urovne: str) -> str:
 
 query_targets = ["Obec", "uroven", "Tok"]
 
-# Filtrovací slova
-filter_query = "http://backend:8000/query" #if "query" not in st.session_state else st.session_state["query"]
-filter_prething = requests.get(filter_query).json()
-filter_done = { keyword:{thing[keyword] for thing in filter_prething} for keyword in query_targets }
-#st.write(filter_done)
+if "keywords_loaded" not in st.session_state:
+    # Filtrovací slova
+    filter_query = "http://backend:8000/query" #if "query" not in st.session_state else st.session_state["query"]
+    print("Requesting there.")
+    filter_prething = requests.get(filter_query).json()
+    filter_done = { keyword:{thing[keyword] for thing in filter_prething} for keyword in query_targets }
+    #st.write(filter_done)
 
-# Vepsání filtrovacích slov do perzistentního stavu
-for key, item in filter_done.items():
-    st.session_state[key] = list(item)
+    # Vepsání filtrovacích slov do perzistentního stavu
+    for key, item in filter_done.items():
+        st.session_state[key] = list(item)
+
+    st.session_state["keywords_loaded"] = True
 
 # Filtrovací cíle
 query_query = {query_p:[] for query_p in query_targets}
@@ -89,9 +93,11 @@ for index, param in enumerate(query_targets):
 point_getter = query_gen(query_query)
 #st.write(point_getter)
 
+
 points = None
 def get_points():
     global points
+    print("Fetching here.")
     points = requests.get(point_getter).json()
     #st.write(points)
     threading.Timer(60, get_points).start()  # Update every 5 minutes
@@ -101,9 +107,6 @@ for key, val in query_query.items():
     print(f"{key}: {val}")
 
 ustecky_kraj_bounds = {'north': 50.95,'south': 50.15,'east': 14.65,'west': 12.85}
-geojson_data = requests.get("http://backend:8000/geojson").json()
-ustecky_boundaries = next((f for f in geojson_data["features"] if "Ústecký kraj" in f["name"]), None)
-# Střed kraje
 center_lat = (ustecky_kraj_bounds['north'] + ustecky_kraj_bounds['south']) / 2
 center_lon = (ustecky_kraj_bounds['east'] + ustecky_kraj_bounds['west']) / 2
 
@@ -121,6 +124,12 @@ usti = fo.Map(
         max_lon=ustecky_kraj_bounds['east'] + 0.05
 )
 
+if "map_loaded" not in st.session_state:
+    #geojson_data = requests.get("http://backend:8000/geojson").json()
+    st.session_state["map_loaded"] = requests.get("http://backend:8000/geojson").json()
+
+ustecky_boundaries = next((f for f in st.session_state["map_loaded"]["features"] if "Ústecký kraj" in f["name"]), None)
+# Střed kraje
 if ustecky_boundaries:
     fo.GeoJson(
         ustecky_boundaries,
@@ -134,7 +143,7 @@ if ustecky_boundaries:
         tooltip=ustecky_boundaries["name"]
     ).add_to(usti)
 else:
-    print("Ústecký kraj nebyl nalezen.")
+    st.error("Ústecký kraj nebyl nalezen.")
 
 for point in points:
     # Popup obsah pro Folium marker
