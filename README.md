@@ -8,4 +8,6 @@ Zpracování otevřených dat z informačního systému veřejné správy  povod
 
 #### Spuštění aplikace
 Stačí mít docker a v kořenovém adresáři *Open_Data_Web_Api/* zadat do příkazové řádky *docker-compose up --build*.
-Docker-compose je rozdělený na backend a frontend konteiner. Nám stačí spustit frontend na portu *8501*. 
+Docker-compose je rozdělený na backend a frontend konteiner. Nám stačí spustit frontend na *localhost:8501*. 
+
+
