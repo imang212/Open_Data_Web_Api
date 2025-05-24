@@ -100,7 +100,7 @@ def query_data(
     Returns:
         JSONResponse: A JSON response containing the filtered data.
     """
-    
+
     filtered_df = df.copy()
 
     if Tok:
@@ -115,3 +115,13 @@ def query_data(
 
     return JSONResponse(content=filtered_df.to_dict(orient="records"))
 
+
+@app.get("/geojson")
+def geojson_data():
+    url = "https://raw.githubusercontent.com/siwekm/czech-geojson/master/kraje.json"
+    response = requests.get(url)
+    if response.status_code == 200:
+        geojson = response.json()
+        return JSONResponse(content=geojson)
+    else:
+        return JSONResponse(content={"error": "Failed to fetch geojson data"}, status_code=500)

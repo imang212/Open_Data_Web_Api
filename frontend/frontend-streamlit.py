@@ -1,7 +1,5 @@
 from __future__ import annotations
-
 import streamlit as st
-#import json
 #import pandas as pd
 import folium as fo
 from streamlit_folium import st_folium
@@ -10,6 +8,7 @@ from typing import Dict, List
 # Nastavení stránky
 #st.set_page_config(layout="wide")
 import threading
+import json
 
 def query_gen(query: Dict[str, List[str]]) -> str:
     """Generates a URL with query parameters for a backend API.
@@ -58,6 +57,7 @@ def nazev_uroven_func(nazev_urovne: str) -> str:
     list_prekladu = ["Suchá", "Neznámá", "Neměřená", "Extrémní", "Normální"]
     return list_prekladu[list_nazvu.index(nazev_urovne)]
 
+
 query_targets = ["Obec", "uroven", "Tok"]
 
 # Filtrovací slova
@@ -75,12 +75,15 @@ query_query = {query_p:[] for query_p in query_targets}
 st.header("Živá mapa povodňových čidel")
 
 # Query picks
+param_labels = {"uroven": "Stav", "Obec": "Obec", "Tok": "Tok"}
+
 query_cols = st.columns(len(query_targets))
 for index, param in enumerate(query_targets):
-    print(index, param)
     with query_cols[index]:
-        query_query[param] = st.multiselect(label=param, options=st.session_state[param])
-
+        query_query[param] = st.multiselect(
+            label=param_labels.get(param, param),  # Zobrazitelný název
+            options=st.session_state[param]
+        )
 # Získání bodů do mapy
 point_getter = query_gen(query_query)
 #st.write(point_getter)
@@ -90,13 +93,15 @@ def get_points():
     global points
     points = requests.get(point_getter).json()
     #st.write(points)
-    threading.Timer(30, get_points).start()  # Update every 5 minutes
+    threading.Timer(60, get_points).start()  # Update every 5 minutes
 get_points()
 
 for key, val in query_query.items():
     print(f"{key}: {val}")
 
 ustecky_kraj_bounds = {'north': 50.95,'south': 50.15,'east': 14.65,'west': 12.85}
+geojson_data = requests.get("http://backend:8000/geojson").json()
+ustecky_boundaries = next((f for f in geojson_data["features"] if "Ústecký kraj" in f["name"]), None)
 # Střed kraje
 center_lat = (ustecky_kraj_bounds['north'] + ustecky_kraj_bounds['south']) / 2
 center_lon = (ustecky_kraj_bounds['east'] + ustecky_kraj_bounds['west']) / 2
@@ -114,6 +119,21 @@ usti = fo.Map(
         min_lon=ustecky_kraj_bounds['west'] - 0.05,
         max_lon=ustecky_kraj_bounds['east'] + 0.05
 )
+
+if ustecky_boundaries:
+    fo.GeoJson(
+        ustecky_boundaries,
+        name="Ústecký kraj",
+        style_function=lambda x: {
+            'fillColor': '#84b1ff',
+            'color': 'black',
+            'weight': 2,
+            'fillOpacity': 0.3
+        },
+        tooltip=ustecky_boundaries["name"]
+    ).add_to(usti)
+else:
+    print("Ústecký kraj nebyl nalezen.")
 
 for point in points:
     # Popup obsah pro Folium marker
