@@ -40,7 +40,7 @@ def query_gen(query: Dict[str, List[str]]) -> str:
 def color_func(level: str) -> str:
     match level:
         case "SUCHO":
-            return "yellow"
+            return "orange"
         case "NELZE":
             return "gray"
         case "VYPNUTO":

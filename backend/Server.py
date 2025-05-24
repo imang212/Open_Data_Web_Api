@@ -78,7 +78,7 @@ def default():
 def query_data(
     Tok: Optional[str] = Query(None, description="Tok"),
     Obec: Optional[str] = Query(None, description="Obec"),
-    uronev: Optional[str] = Query(None, description="uronev")
+    uroven: Optional[str] = Query(None, description="uroven")
 ):
     """
     Query the data based on the provided parameters.
@@ -91,14 +91,15 @@ def query_data(
     Returns:
         JSONResponse: A JSON response containing the filtered data.
     """
+    print(uroven)
     filtered_df = df.copy()
 
     if Tok:
         filtered_df = filtered_df[filtered_df['Tok'] == Tok]
     if Obec:
         filtered_df = filtered_df[filtered_df['Obec'] == Obec]
-    if uronev:
-        filtered_df = filtered_df[filtered_df['uronev'] == uronev]
+    if uroven:
+        filtered_df = filtered_df[filtered_df['uroven'] == uroven]
 
     return JSONResponse(content=filtered_df.to_dict(orient="records"))
 
