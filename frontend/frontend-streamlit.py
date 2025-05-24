@@ -138,8 +138,8 @@ usti = fo.Map(
         max_bounds=True,
         min_lat=ustecky_kraj_bounds['south'] - 0.15,  # Malý buffer
         max_lat=ustecky_kraj_bounds['north'] + 0.15,
-        min_lon=ustecky_kraj_bounds['west'] - 0.10,
-        max_lon=ustecky_kraj_bounds['east'] + 0.10
+        min_lon=ustecky_kraj_bounds['west'] - 0.15,
+        max_lon=ustecky_kraj_bounds['east'] + 0.15
 )
 
 if "map_loaded" not in st.session_state:
