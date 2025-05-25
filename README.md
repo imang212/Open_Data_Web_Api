@@ -17,7 +17,7 @@ Běží na Dockeru
 
 #### Spuštění aplikace
 Stačí mít docker a v kořenovém adresáři *Open_Data_Web_Api/* zadat do příkazové řádky *docker-compose up --build*.
-Docker-compose je rozdělený na backend(FastApi) a frontend konteiner(nginx(Streamlit)). Nám stačí spustit frontend na *localhost:8501*. 
+Docker-compose je rozdělený na backend(Uvicorn) a frontend konteiner(Nginx). Nám stačí spustit frontend na *localhost:8501*. 
 
 ### Popis api
 ![image](https://github.com/user-attachments/assets/815d0469-9c1e-476f-ade7-6f168084ee7e)
