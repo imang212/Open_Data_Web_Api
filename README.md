@@ -7,6 +7,7 @@ Zpracování otevřených dat z informačního systému veřejné správy povod�
 Jazyk: Python
 
 Backend: FastApi 
+
 Frontend: Nginx , Streamlit, Folium
 
 Běží na Dockeru
