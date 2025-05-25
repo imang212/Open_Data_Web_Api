@@ -51,12 +51,20 @@ def color_uroven_func(level: str) -> str:
         case "NORMAL":
             return "green"
         case _:
-            raise ValueError("Unexpected level")
+            return "black"
 
 def nazev_uroven_func(nazev_urovne: str) -> str:
-    list_nazvu = ["SUCHO", "NELZE", "VYPNUTO", "EXTREM", "NORMAL"]
-    list_prekladu = ["Suchá", "Neznámá", "Neměřená", "Extrémní", "Normální"]
-    return list_prekladu[list_nazvu.index(nazev_urovne)]
+    match nazev_urovne:
+        case "SUCHO":
+            return "Suchá"
+        case "NELZE":
+            return "Neznámá"
+        case "EXTREM":
+            return "Extrémní"
+        case "NORMAL":
+            return "Normální"
+        case _:
+            return "Vypnuto"
 
 def format_date_time(date_time_str: str) -> str:
     months = ["ledna", "února", "března", "dubna", "května", "června", "července", "srpna", "září", "října", "listopadu", "prosince"]
@@ -109,7 +117,7 @@ for index, param in enumerate(query_targets):
         )
 # Získání bodů do mapy
 point_getter = query_gen(query_query)
-#st.write(point_getter)
+st.write(point_getter)
 
 
 points = None
